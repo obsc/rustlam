@@ -8,5 +8,5 @@ name = "lam"
 path = "src/lib.rs"
 
 [[bin]]
-name = "rustlam"
-path = "src/main.rs"
+name = "repl"
+path = "src/bin/repl.rs"
