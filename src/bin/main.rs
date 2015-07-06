@@ -1,7 +1,12 @@
 mod repl;
 
+use std::env;
 use repl::repl;
 
 fn main() {
-    repl();
+    let mut args = env::args().skip(1);
+    match args.next() {
+        Some(f) => println!("{}", f),
+        None    => repl(),
+    };
 }
