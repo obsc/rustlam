@@ -1,0 +1,12 @@
+[package]
+name = "rustlam"
+version = "0.1.0"
+authors = ["Rene Zhang <rz99@cornell.edu>"]
+
+[lib]
+name = "lam"
+path = "src/lib.rs"
+
+[[bin]]
+name = "rustlam"
+path = "src/main.rs"
