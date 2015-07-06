@@ -3,19 +3,25 @@ use std::io::Write;
 
 fn write(out: &str) {
     print!("{}", out);
-    io::stdout().flush().unwrap_or(());
+    match io::stdout().flush() {
+        Ok(u)  => u,
+        Err(e) => println!("Failed to flush stdout: {}", e),
+    };
 }
 
 pub fn repl() {
+    let mut input = String::new();
+
     loop {
-        let mut input = String::new();
         write("> ");
 
-        let read_bytes = io::stdin().read_line(&mut input)
-            .ok()
-            .expect("Failed to read line!");
+        input.clear();
+        let bytes_read = match io::stdin().read_line(&mut input) {
+            Ok(b)  => b,
+            Err(e) => { println!("Failed to read stdin: {}", e); 0 },
+        };
 
-        if read_bytes == 0 {
+        if bytes_read == 0 {
             println!("\nExiting...");
             break;
         }
