@@ -1,31 +1,29 @@
 use std::io;
 use std::io::Write;
 
+use lam::scanner::StdScanner;
+
 fn write(out: &str) {
     print!("{}", out);
-    match io::stdout().flush() {
-        Err(why) => println!("Failed to flush stdout: {}", why),
-        Ok(unit) => unit,
-    };
+    if let Err(why) = io::stdout().flush() {
+        println!("Failed to flush stdout: {}", why)
+    }
 }
 
 pub fn repl() {
-    let mut input = String::new();
+    let mut scanner = StdScanner::new();
 
     loop {
         write("> ");
 
-        input.clear();
-        let bytes_read = match io::stdin().read_line(&mut input) {
-            Err(why)  => { println!("Failed to read stdin: {}", why); 0 },
-            Ok(bytes) => bytes,
-        };
-
-        if bytes_read == 0 {
-            println!("\nExiting...");
-            break;
+        match scanner.read_line() {
+            None       => {
+                println!("\nExiting...");
+                break;
+            }
+            Some(line) => {
+                write(line);
+            }
         }
-
-        write(&input);
     }
 }

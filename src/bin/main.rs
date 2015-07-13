@@ -1,11 +1,13 @@
+extern crate lam;
+
 mod repl;
 
 use std::env;
 use repl::repl;
 
 fn main() {
-    let mut args = env::args().skip(1);
-    match args.next() {
+    let arg = env::args().nth(1);
+    match arg {
         Some(f) => println!("{}", f),
         None    => repl(),
     };
