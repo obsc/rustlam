@@ -1,11 +1,9 @@
 use std::io;
 use std::collections::VecDeque;
 
-pub type Character = char;
-
 pub struct StdScanner {
     std: io::Stdin,
-    buf: VecDeque<String>,
+    buf: VecDeque<Vec<char>>,
     ind: usize,
 }
 
@@ -18,28 +16,36 @@ impl StdScanner {
         }
     }
 
-    pub fn read_line(&mut self) -> Option<&String> {
+    pub fn read_line(&mut self) -> Option<String> {
         let mut line = String::new();
 
-        let bytes_read = match self.std.read_line(&mut line) {
-            Err(_)  => 0,
-            Ok(bytes) => bytes,
-        };
-
-        match bytes_read {
-            0 => None,
+        match self.std.read_line(&mut line) {
+            Ok(bytes) if bytes > 0 => {
+                self.buf.push_back(line.chars().collect());
+                Some(line)
+            }
             _ => {
-                self.buf.push_back(line);
-                self.buf.back()
+                None
             }
         }
     }
 }
 
 impl Iterator for StdScanner {
-    type Item = Character;
+    type Item = char;
 
-    fn next(&mut self) -> Option<Character> {
-        None
+    fn next(&mut self) -> Option<char> {
+        let cl = self.buf.front()
+            .map(|line| (line[self.ind], line.len()));
+
+        cl.map(|(c, l)| {
+            if self.ind + 1 == l {
+                self.ind = 0;
+                self.buf.pop_front();
+            } else {
+                self.ind += 1;
+            }
+            c
+        })
     }
 }

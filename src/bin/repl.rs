@@ -22,7 +22,7 @@ pub fn repl() {
                 break;
             }
             Some(line) => {
-                write(line);
+                write(&line);
             }
         }
     }
