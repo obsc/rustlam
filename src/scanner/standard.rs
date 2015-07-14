@@ -1,6 +1,8 @@
 use std::io;
 use std::collections::VecDeque;
 
+use super::Scan;
+
 pub struct StdScanner {
     std: io::Stdin,
     buf: VecDeque<Vec<char>>,
@@ -30,6 +32,8 @@ impl StdScanner {
         }
     }
 }
+
+impl Scan for StdScanner {}
 
 impl Iterator for StdScanner {
     type Item = char;
