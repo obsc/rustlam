@@ -2,47 +2,61 @@ pub mod standard;
 
 pub use self::standard::StdScanner;
 
-pub trait Scan: Iterator<Item = char> {}
-
-pub struct Scanner<S: Scan> {
-    scanner: S,
-    src: u32,
-    line: u32,
-    col: u32,
+pub struct Scanner<I> where I: Iterator<Item = String> {
+    iter: I,
+    src: usize,
+    line: usize,
+    col: usize,
+    text: Vec<String>,
+    buf: Vec<char>,
 }
 
 #[derive(Debug)]
 pub struct Character {
     cargo: char,
-    src: u32,
-    line: u32,
-    col: u32,
+    src: usize,
+    line: usize,
+    col: usize,
 }
 
-impl<S: Scan> Scanner<S> {
-    pub fn new(inner: S) -> Self {
+impl<I> Scanner<I> where I: Iterator<Item = String> {
+    pub fn new(inner: I) -> Self {
         Scanner{
-            scanner: inner,
+            iter: inner,
             src: 0,
             line: 0,
             col: 0,
+            text: Vec::new(),
+            buf: Vec::new(),
         }
     }
 
-    pub fn get_ref(&self) -> &S {
-        &self.scanner
+    pub fn get_ref(&self) -> &I {
+        &self.iter
     }
 
-    pub fn get_mut(&mut self) -> &mut S {
-        &mut self.scanner
+    pub fn get_mut(&mut self) -> &mut I {
+        &mut self.iter
     }
 }
 
-impl<S: Scan> Iterator for Scanner<S> {
+impl<I> Iterator for Scanner<I> where I: Iterator<Item = String> {
     type Item = Character;
 
     fn next(&mut self) -> Option<Character> {
-        self.scanner.next().map(|c| {
+        let c = match self.buf.get(self.col) {
+            Some(&c) => Some(c),
+            None     => {
+                self.iter.next().map(|line| {
+                    self.buf = line.trim_right().chars().collect();
+                    self.buf.push('\n');
+                    self.text.push(line);
+                    self.buf[self.col]
+                })
+            },
+        };
+
+        c.map(|c| {
             let out = Character{
                 cargo: c,
                 src: self.src,
@@ -52,6 +66,7 @@ impl<S: Scan> Iterator for Scanner<S> {
 
             self.src += 1;
             if c == '\n' {
+                self.buf = Vec::new();
                 self.col = 0;
                 self.line += 1;
             } else {

@@ -16,7 +16,7 @@ pub fn repl() {
     loop {
         write("> ");
 
-        match scanner.get_mut().read_line() {
+        match scanner.get_mut().next_line() {
             None       => {
                 println!("\nExiting...");
                 break;
