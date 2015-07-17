@@ -1,6 +1,8 @@
 pub mod standard;
+pub mod file;
 
 pub use self::standard::StdScanner;
+pub use self::file::FileScanner;
 
 pub struct Scanner<I> where I: Iterator<Item = String> {
     iter: I,
