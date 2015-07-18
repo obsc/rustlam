@@ -1,33 +1,29 @@
 pub mod standard;
 pub mod file;
 
+use super::Location;
+
 pub use self::standard::StdScanner;
 pub use self::file::FileScanner;
 
 pub struct Scanner<I> where I: Iterator<Item = String> {
     iter: I,
-    src: usize,
-    line: usize,
-    col: usize,
+    loc: Location,
     text: Vec<String>,
     buf: Vec<char>,
 }
 
 #[derive(Debug)]
 pub struct Character {
-    cargo: char,
-    src: usize,
-    line: usize,
-    col: usize,
+    data: char,
+    loc: Location,
 }
 
 impl<I> Scanner<I> where I: Iterator<Item = String> {
     pub fn new(inner: I) -> Self {
         Scanner{
             iter: inner,
-            src: 0,
-            line: 0,
-            col: 0,
+            loc: Location::new(),
             text: Vec::new(),
             buf: Vec::new(),
         }
@@ -46,33 +42,29 @@ impl<I> Iterator for Scanner<I> where I: Iterator<Item = String> {
     type Item = Character;
 
     fn next(&mut self) -> Option<Character> {
-        let c = match self.buf.get(self.col) {
+        let c = match self.buf.get(self.loc.get_col()) {
             Some(&c) => Some(c),
             None     => {
                 self.iter.next().map(|line| {
                     self.buf = line.trim_right().chars().collect();
                     self.buf.push('\n');
                     self.text.push(line);
-                    self.buf[self.col]
+                    self.buf[self.loc.get_col()]
                 })
             },
         };
 
         c.map(|c| {
             let out = Character{
-                cargo: c,
-                src: self.src,
-                line: self.line,
-                col: self.col,
+                data: c,
+                loc: self.loc,
             };
 
-            self.src += 1;
             if c == '\n' {
-                self.buf = Vec::new();
-                self.col = 0;
-                self.line += 1;
+                self.buf.clear();
+                self.loc.next_row();
             } else {
-                self.col += 1;
+                self.loc.next_col();
             }
 
             out
