@@ -1,5 +1,7 @@
 use super::super::Location;
+use super::super::scanner::Character;
 
+#[derive(Debug)]
 pub enum Symbol {
     LParens,
     RParens,
@@ -7,11 +9,13 @@ pub enum Symbol {
     Dot,
 }
 
+#[derive(Debug)]
 pub enum TokenData {
     Symbol(Symbol),
     Identifier(String),
 }
 
+#[derive(Debug)]
 pub struct Token {
   data: TokenData,
   loc: Location,
@@ -26,12 +30,13 @@ impl Token {
     }
 }
 
-pub fn get_symbol(c: char) -> Option<Symbol> {
-    match c {
-        '('  => Some(Symbol::LParens),
-        ')'  => Some(Symbol::RParens),
-        '\\' => Some(Symbol::Lambda),
-        '.'  => Some(Symbol::Dot),
+pub fn get_token(c: Character) -> Option<Token> {
+    let loc = c.get_loc();
+    match c.get_char() {
+        '('  => Some(Token::new(TokenData::Symbol(Symbol::LParens), loc)),
+        ')'  => Some(Token::new(TokenData::Symbol(Symbol::RParens), loc)),
+        '\\' => Some(Token::new(TokenData::Symbol(Symbol::Lambda), loc)),
+        '.'  => Some(Token::new(TokenData::Symbol(Symbol::Dot), loc)),
         _    => None
     }
 }

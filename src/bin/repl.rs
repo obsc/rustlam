@@ -1,7 +1,8 @@
 use std::io;
 use std::io::Write;
 
-use lam::scanner::{Scanner, StdScanner};
+use lam::lexer::Lexer;
+use lam::scanner::StdScanner;
 
 fn write(out: &str) {
     print!("{}", out);
@@ -11,12 +12,12 @@ fn write(out: &str) {
 }
 
 pub fn repl() {
-    let mut scanner = Scanner::new(StdScanner::new());
+    let mut lexer = Lexer::new(StdScanner::new());
 
     loop {
         write("> ");
 
-        match scanner.get_mut().next_line() {
+        match lexer.get_mut().next_line() {
             None       => {
                 println!("\nExiting...");
                 break;
@@ -26,8 +27,8 @@ pub fn repl() {
             }
         }
 
-        for c in &mut scanner {
-            println!("{:?}", c);
+        for tok in &mut lexer {
+            println!("{:?}", tok);
         }
     }
 }
