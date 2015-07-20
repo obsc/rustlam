@@ -13,10 +13,15 @@ pub struct Scanner<I> where I: Iterator<Item = String> {
     buf: Vec<char>,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Copy, Clone)]
 pub struct Character {
     data: char,
     loc: Location,
+}
+
+impl Character {
+    pub fn get_char(&self) -> char { self.data }
+    pub fn get_loc(&self) -> Location { self.loc }
 }
 
 impl<I> Scanner<I> where I: Iterator<Item = String> {
