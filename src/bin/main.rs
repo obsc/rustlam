@@ -5,7 +5,8 @@ mod repl;
 use std::env;
 use repl::repl;
 
-use lam::scanner::{Scanner, FileScanner};
+use lam::lexer::Lexer;
+use lam::scanner::FileScanner;
 
 fn main() {
     let arg = env::args().nth(1);
@@ -14,9 +15,9 @@ fn main() {
           FileScanner::new(&*f).map_or_else(|| {
             println!("Unable to read file.")
           }, |f| {
-            let scanner = Scanner::new(f);
-            for c in scanner {
-              println!("{:?}", c);
+            let lexer = Lexer::new(f);
+            for tok in lexer {
+              println!("{:?}", tok);
             }
           })
         }
